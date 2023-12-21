@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "strict": true,
+    "jsx": "preserve",
+    "jsxImportSource": "solid-js"
+  },
+  "include": ["src/**/*", "example/**/*"],
+  "exclude": ["node_modules"]
+}

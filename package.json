@@ -1,0 +1,41 @@
+{
+  "name": "solid-dockview",
+  "version": "1.0.0",
+  "description": "Docking Layout for Solid.js, based on dockview-core",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "prepack": "npm run build",
+    "build": "vite build",
+    "dev": "vite"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lyonbot/solid-dockview.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lyonbot/solid-dockview/issues"
+  },
+  "homepage": "https://github.com/lyonbot/solid-dockview#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "dockview-core": "^1.8.5",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.0",
+    "prettier": "^3.1.1",
+    "solid-js": "^1.8.7",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10",
+    "vite-plugin-dts": "^3.6.4",
+    "vite-plugin-solid": "^2.8.0"
+  },
+  "peerDependencies": {
+    "dockview-core": "^1.8.5",
+    "solid-js": "^1.8.7"
+  }
+}
