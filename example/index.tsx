@@ -3,6 +3,7 @@ import { render } from "solid-js/web";
 import { DockPanel, DockView, openPanel } from "../src";
 import "dockview-core/dist/styles/dockview.css";
 import { StarSVG } from "./icons";
+import nyan from "./nyancat.ico";
 
 const App = () => {
   const [inevitableOpenTimes, setInevitableOpenTimes] = createSignal(0);
@@ -71,7 +72,7 @@ function ComplexExamplePanel(props: {}) {
       title={
         // title with nyan cat inside
         <div>
-          <img src="./nyancat.ico" /> {title()}
+          <img src={nyan} /> {title()}
         </div>
       }
       closeable={closable()}

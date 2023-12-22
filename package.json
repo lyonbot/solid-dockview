@@ -9,6 +9,12 @@
     "build": "vite build",
     "dev": "vite"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lyonbot/solid-dockview.git"
