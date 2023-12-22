@@ -1,0 +1,16 @@
+.solid-dockview-panel-content {
+  display: contents;
+}
+
+/* in case <button> */
+.default-tab .tab-action {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+
+  &:disabled {
+    color: initial;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}

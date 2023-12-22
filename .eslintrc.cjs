@@ -8,6 +8,7 @@ module.exports = {
   plugins: ["@typescript-eslint"],
   root: true,
   rules: {
+    "@typescript-eslint/ban-types": 0,
     "@typescript-eslint/no-explicit-any": 0,
   },
 };

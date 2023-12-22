@@ -17,7 +17,7 @@ export default defineConfig({
       formats: ["es"],
     },
     rollupOptions: {
-      external: ["solid-js", "dockview-core"],
+      external: ["solid-js", /^solid-js\//, "dockview-core"],
     },
     emptyOutDir: true,
   },
