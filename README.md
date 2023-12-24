@@ -26,7 +26,7 @@ const App = () => {
 
 ## Caveats
 
-### controlling APIs
+### control dockview with api
 
 `solid-dockview` is a wrapper around `dockview-core`, and you can gain the original `DockviewComponent` or `DockPanelComponent` instances.
 
@@ -78,3 +78,35 @@ However, it could be tedious to do this for every panel. If you want to apply th
 ```
 
 And for specific panels, you can still override the class name with `<DockPanel class="my-panel-content-style">`
+
+### placeholder for empty groups
+
+In dockview, you can use [Watermark](https://dockview.dev/docs/components/dockview/#watermark) to show a placeholder when a group is empty. All you need to do is to provide a `watermarkComponent` to `<DockView>`.
+
+```jsx
+<DockView class="dockview-theme-light" watermarkComponent={MyWatermark}>
+  {/* your panels */}
+</DockView>
+```
+
+In your watermark component, you can use `group` and `close` to control the group. Beware that `group` can be `undefined` when nothing is docked.
+
+```jsx
+import { DockViewWatermarkProps } from "solid-dockview";
+
+function MyWatermark({ group, close }: DockViewWatermarkProps) {
+  return (
+    <div style="display: flex; align-items: center; height: 100%; justify-content: center; color: #CCC; flex-flow: column">
+
+      <p><strong>Nothing to display</strong></p>
+      <p>Wanna open some file?</p>
+
+      {!!group && (
+        <p>
+          <button onClick={close}>close this group</button>
+        </p>
+      )}
+    </div>
+  );
+}
+```

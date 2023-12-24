@@ -5,7 +5,7 @@ type Diff<A, B> = Exclude<A, B> | Exclude<B, A>;
 /**
  * nothing in JavaScript, just a TypeScript trick to ensure all keys of A are present
  *
- * @example const keys = strictKeys<PanelState>()(["panel", "context", "props", "isOpen"]);
+ * @example const keys = strictKeys<PanelState>()(["panel", "context", "props", "isOpen"]) satisfies readonly string[];
  */
 export const strictKeys =
   <A>() =>

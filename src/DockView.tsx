@@ -1,6 +1,6 @@
-import { ParentProps, createSignal, onCleanup, onMount } from "solid-js";
+import { For, JSX, ParentProps, createSignal, onCleanup, onMount } from "solid-js";
 import { HTMLDomAttrs } from "./dom-attrs";
-import { createDockViewContext, DockViewContext } from "./context";
+import { createDockViewContext, DockViewContext, DockViewWatermarkProps } from "./context";
 import { DockviewEventListeners, dockviewEventNames } from "./events";
 import { strictKeys } from "./utils";
 import style from "./style.scss?inline";
@@ -15,6 +15,7 @@ export type DockViewProps = ParentProps<
 
     onReady?: (event: { dockview: DockviewComponent }) => void;
     onDispose?: (event: { dockview: DockviewComponent }) => void;
+    watermarkComponent?: (props: DockViewWatermarkProps) => JSX.Element;
   }
 >;
 
@@ -24,7 +25,8 @@ export const dockViewPropKeys = strictKeys<DockViewProps>()([
   ...dockviewEventNames,
   "onReady",
   "onDispose",
-]);
+  "watermarkComponent",
+]) satisfies readonly string[];
 
 export function DockView(props: DockViewProps & HTMLDomAttrs) {
   const context = createDockViewContext(props);
@@ -56,6 +58,7 @@ export function DockView(props: DockViewProps & HTMLDomAttrs) {
     <DockViewContext.Provider value={context}>
       {context.element}
       {ready() && props.children}
+      <For each={context.extraRenders()}>{(el) => el()}</For>
     </DockViewContext.Provider>
   );
 }

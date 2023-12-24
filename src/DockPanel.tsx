@@ -46,6 +46,10 @@ export function DockPanel(props: DockPanelProps) {
 
   const contentPlaceholder = document.createElement("div");
   const tabPlaceholder = document.createElement("div");
+
+  contentPlaceholder.style.display = "contents";
+  tabPlaceholder.style.display = "contents";
+
   const panel = context.dockview.addPanel({
     id: props.id || `anonymous-${anonymousCounter++}`,
     component: "default",
@@ -86,11 +90,6 @@ export function DockPanel(props: DockPanelProps) {
     <Portal
       mount={contentPlaceholder}
       ref={(div) => {
-        // a <Portal> becomes <div>, which shall be moved outside, reducing one level of <div>
-        contentPlaceholder.after(div);
-        if (contentPlaceholder.parentNode) contentPlaceholder.remove();
-        (panel.params as PanelContentRendererParams).contentElement = div;
-
         const className = createMemo(() => props.class || "solid-dockview-panel-content");
         createEffect(() => (div.className = className()));
       }}
@@ -146,10 +145,6 @@ function setupTab(props: DockPanelProps, panel: DockviewPanel, placeholder: HTML
     <Portal
       mount={placeholder}
       ref={(div) => {
-        placeholder.after(div);
-        if (placeholder.parentNode) placeholder.remove();
-        (panel.params as PanelContentRendererParams).tabElement = div;
-
         createEffect(() => (div.className = className()));
       }}
     >
