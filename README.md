@@ -42,8 +42,8 @@ You can find documentation for `dockview-core`:
     console.log("dockview ready", dockview);
     // TODO: store `dockview` and use its APIs
 
-    // Note: default panels are not created yet.
-    // to wait them, use onMount(() => { ... })
+    // Note: panels are not initialized yet.
+    // to wait them, use onMount(() => { ... }) to wait for next update
   }}
 >
   <DockPanel

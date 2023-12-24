@@ -83,7 +83,10 @@ export function DockPanel(props: DockPanelProps) {
   props.onCreate?.({ panel, dockview });
   onCleanup(() => {
     props.onDispose?.({ panel, dockview });
-    context.dockview.removePanel(panel);
+
+    if (panelStateLUT.get(panel)?.isOpen) {
+      context.dockview.removePanel(panel);
+    }
   });
 
   return (

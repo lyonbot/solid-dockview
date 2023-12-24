@@ -1,23 +1,5 @@
-import {
-  Accessor,
-  JSXElement,
-  createComponent,
-  createContext,
-  createSignal,
-  getOwner,
-  onCleanup,
-  runWithOwner,
-} from "solid-js";
-import {
-  DockviewComponent,
-  DockviewGroupPanel,
-  DockviewPanel,
-  IContentRenderer,
-  IGroupPanelInitParameters,
-  ITabRenderer,
-  IWatermarkRenderer,
-  WatermarkRendererInitParameters,
-} from "dockview-core";
+import { Accessor, JSXElement, createContext, createSignal, onCleanup } from "solid-js";
+import { DockviewComponent, DockviewComponentOptions, DockviewPanel } from "dockview-core";
 
 import { useSyncDOMAttrs } from "./dom-attrs";
 import { dockviewEventNames } from "./events";
@@ -25,14 +7,14 @@ import type { DockPanelProps, DockViewProps } from "./index";
 import { keyedDebounce, watch } from "./utils";
 import { panelStateLUT } from "./global-api";
 import { dockViewPropKeys } from "./DockView";
-import { Portal } from "solid-js/web";
+import {
+  PanelContentRenderer,
+  PanelTabRenderer,
+  createGroupHeaderComponent,
+  createWatermarkComponent,
+} from "./glue-component";
 
 export const DockViewContext = createContext<ReturnType<typeof createDockViewContext>>();
-
-export interface DockViewWatermarkProps extends WatermarkRendererInitParameters {
-  /** if this watermark places in an empty group, close it. */
-  close(): void;
-}
 
 export function createDockViewContext(props: DockViewProps) {
   const element = document.createElement("div");
@@ -46,8 +28,7 @@ export function createDockViewContext(props: DockViewProps) {
     };
   };
 
-  const owner = getOwner();
-  const dockview = new DockviewComponent({
+  const options: DockviewComponentOptions = {
     parentElement: element,
     components: {
       default: PanelContentRenderer,
@@ -55,56 +36,15 @@ export function createDockViewContext(props: DockViewProps) {
     tabComponents: {
       default: PanelTabRenderer,
     },
-    watermarkComponent: class WatermarkComponent implements IWatermarkRenderer {
-      _element!: HTMLElement;
-      _remove?: () => void;
+    singleTabMode: props.singleTabMode,
+    watermarkComponent: createWatermarkComponent(props, addExtraRender),
+    createPrefixHeaderActionsElement: createGroupHeaderComponent(props, "prefixHeaderActionsComponent", addExtraRender),
+    createLeftHeaderActionsElement: createGroupHeaderComponent(props, "leftHeaderActionsComponent", addExtraRender),
+    createRightHeaderActionsElement: createGroupHeaderComponent(props, "rightHeaderActionsComponent", addExtraRender),
+  };
 
-      get element() {
-        return this._element;
-      }
-
-      init(params: WatermarkRendererInitParameters): void {
-        const outerElement = document.createElement("div");
-        outerElement.style.display = "contents";
-        this._element = outerElement;
-
-        const watermarkProps: DockViewWatermarkProps = {
-          ...params,
-          close() {
-            if (params.group) {
-              params.containerApi.removeGroup(params.group);
-            }
-          },
-        };
-
-        runWithOwner(owner, () => {
-          // must be a render function, or <DockView> will not correctly handle user's watermark component's lifecycle
-          // (maybe the signal containing <Portal>, must be created and initialized at the moment that <For> renders a new item?)
-          const jsxRender = () => (
-            <Portal
-              mount={outerElement}
-              ref={(div) => {
-                div.style.display = "contents";
-              }}
-            >
-              {!!props.watermarkComponent && createComponent(props.watermarkComponent, watermarkProps)}
-            </Portal>
-          );
-
-          const dispose = addExtraRender(jsxRender);
-          this._remove = dispose;
-        });
-      }
-
-      dispose(): void {
-        this._remove?.();
-      }
-
-      updateParentGroup(_group: DockviewGroupPanel, _visible: boolean): void {
-        // noop yet
-      }
-    },
-  });
+  props.onBeforeCreate?.(options, props);
+  const dockview = new DockviewComponent(options);
 
   // add event listeners
   dockviewEventNames.forEach((eventName) => {
@@ -137,28 +77,4 @@ export interface PanelContentRendererParams {
   contentElement: HTMLElement;
   tabElement: HTMLElement;
   props: DockPanelProps;
-}
-
-class PanelContentRenderer implements IContentRenderer {
-  private _params!: PanelContentRendererParams;
-
-  get element(): HTMLElement {
-    return this._params.contentElement;
-  }
-
-  init(params: IGroupPanelInitParameters): void {
-    this._params = params.params as PanelContentRendererParams;
-  }
-}
-
-class PanelTabRenderer implements ITabRenderer {
-  private _params!: PanelContentRendererParams;
-
-  get element(): HTMLElement {
-    return this._params.tabElement;
-  }
-
-  init(params: IGroupPanelInitParameters): void {
-    this._params = params.params as PanelContentRendererParams;
-  }
 }

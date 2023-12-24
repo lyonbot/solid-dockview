@@ -1,12 +1,49 @@
-import { createSignal } from "solid-js";
+import { For, createEffect, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import { DockPanel, DockView, openPanel } from "../src";
 import "dockview-core/dist/styles/dockview.css";
+
 import { StarSVG } from "./icons";
 import nyan from "./nyancat.ico";
+import "./style.scss";
+import { DockviewComponent } from "dockview-core";
+
+type MyDocument = {
+  id: string;
+  content: string;
+};
 
 const App = () => {
   const [inevitableOpenTimes, setInevitableOpenTimes] = createSignal(0);
+  const [documents, updateDocuments] = createSignal<MyDocument[]>([]);
+
+  let currentDockview: DockviewComponent;
+
+  function createDocumentInGroup(group: any) {
+    const id = `document-${Date.now()}`;
+    const [content, setContent] = createSignal("Across the Great Wall we can reach every corner in the world.");
+
+    updateDocuments((docs) => [
+      ...docs,
+      {
+        id,
+
+        // being lazy
+        get content() {
+          return content();
+        },
+        set content(v) {
+          setContent(v);
+        },
+      },
+    ]);
+
+    // after next rendering, move the panel to given group
+    createEffect(() => {
+      const panel = currentDockview.panels.find((x) => x.id === id);
+      panel?.api.moveTo({ group });
+    });
+  }
 
   return (
     <div>
@@ -19,8 +56,16 @@ const App = () => {
         style={{ height: "500px", border: "1px solid #ccc" }}
         onReady={({ dockview }) => {
           console.log("dockview ready", dockview);
+          currentDockview = dockview;
           window.dockview = dockview;
         }}
+        singleTabMode="default"
+        leftHeaderActionsComponent={(props) => (
+          <MyRightHeaderActions
+            isGroupActive={props.isGroupActive}
+            onAddPanel={() => createDocumentInGroup(props.group)}
+          />
+        )}
       >
         {/* simple panel */}
         <DockPanel title="First Panel">
@@ -56,6 +101,29 @@ const App = () => {
         <DockPanel title="Floating" floating={{ width: 400, height: 200, x: 300, y: 100 }}>
           <p>Default Floating</p>
         </DockPanel>
+
+        {/* render documents as panels */}
+        <For each={documents()}>
+          {(document) => (
+            <DockPanel
+              id={document.id}
+              title={document.id}
+              onClose={() => {
+                // remove document
+                console.log("Removing document ", document);
+                updateDocuments((p) => p.filter((x) => x.id !== document.id));
+              }}
+            >
+              <textarea
+                class="myTextarea"
+                value={document.content}
+                onChange={(e) => {
+                  document.content = e.currentTarget.value;
+                }}
+              />
+            </DockPanel>
+          )}
+        </For>
       </DockView>
     </div>
   );
@@ -109,6 +177,15 @@ function ComplexExamplePanel(props: {}) {
         </p>
       </div>
     </DockPanel>
+  );
+}
+
+function MyRightHeaderActions(props: { onAddPanel(): void; isGroupActive: boolean }) {
+  return (
+    <div class="myAddDocumentButton-wrapper" data-active-group={props.isGroupActive} onClick={props.onAddPanel}>
+      {/* display a green circle in active group */}
+      <div class="myAddDocumentButton-text">+</div>
+    </div>
   );
 }
 
